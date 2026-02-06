@@ -6,6 +6,9 @@ COPY backend/package.json backend/bun.lock ./
 RUN bun install --frozen-lockfile
 
 COPY backend/ .
+
+ARG DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+ENV DATABASE_URL=$DATABASE_URL
 RUN bunx prisma generate
 
 FROM oven/bun:1-slim
