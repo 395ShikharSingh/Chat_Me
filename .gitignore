@@ -31,14 +31,14 @@ pnpm-debug.log*
 *.tmp
 *.temp
 
-backend /node_modules/
-backend /generated/
-backend /dist/
-backend /out/
-backend /.env
-backend /coverage/
-backend /*.tsbuildinfo
-backend /bun.lockb
+backend/node_modules/
+backend/generated/
+backend/dist/
+backend/out/
+backend/.env
+backend/coverage/
+backend/*.tsbuildinfo
+backend/bun.lockb
 
 frontend/node_modules/
 frontend/dist/
