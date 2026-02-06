@@ -2,10 +2,10 @@ FROM oven/bun:1 AS builder
 
 WORKDIR /app
 
-COPY package.json bun.lock ./
+COPY backend/package.json backend/bun.lock ./
 RUN bun install --frozen-lockfile
 
-COPY . .
+COPY backend/ .
 RUN bunx prisma generate
 
 FROM oven/bun:1-slim
