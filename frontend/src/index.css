@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
+  --primary: #0ea5e9;
+  --primary-dark: #0284c7;
   --bg-dark: #0f172a;
   --bg-card: #1e293b;
   --bg-input: #334155;
@@ -40,14 +40,14 @@ body {
 }
 
 .btn-gradient {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
   transition: all 0.3s ease;
 }
 
 .btn-gradient:hover {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #0284c7 0%, #0891b2 100%);
   transform: translateY(-1px);
-  box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 10px 40px -10px rgba(14, 165, 233, 0.5);
 }
 
 .message-bubble {
@@ -96,7 +96,7 @@ body {
 }
 
 .input-glow:focus {
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3);
 }
 
 .room-card {
@@ -104,8 +104,8 @@ body {
 }
 
 .room-card:hover {
-  background: rgba(99, 102, 241, 0.1);
-  border-color: rgba(99, 102, 241, 0.3);
+  background: rgba(14, 165, 233, 0.1);
+  border-color: rgba(14, 165, 233, 0.3);
 }
 
 .online-pulse {

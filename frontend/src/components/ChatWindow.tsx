@@ -36,9 +36,9 @@ export function ChatWindow({
         return (
             <div className="flex-1 flex items-center justify-center bg-slate-900/50">
                 <div className="text-center">
-                    <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-600/20 flex items-center justify-center">
+                    <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-sky-500/20 to-cyan-500/20 flex items-center justify-center">
                         <svg
-                            className="w-10 h-10 text-indigo-400"
+                            className="w-10 h-10 text-sky-400"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -64,7 +64,7 @@ export function ChatWindow({
         <div className="flex-1 flex flex-col bg-slate-900/50">
             <div className="px-6 py-4 border-b border-slate-700/50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
                         <svg
                             className="w-5 h-5 text-white"
                             fill="none"
@@ -93,9 +93,9 @@ export function ChatWindow({
             </div>
 
             {notifications.length > 0 && (
-                <div className="px-6 py-2 bg-indigo-500/10 border-b border-indigo-500/20">
+                <div className="px-6 py-2 bg-sky-500/10 border-b border-sky-500/20">
                     {notifications.slice(-3).map((notification, i) => (
-                        <p key={i} className="text-sm text-indigo-300">
+                        <p key={i} className="text-sm text-sky-300">
                             {notification}
                         </p>
                     ))}
@@ -117,7 +117,7 @@ export function ChatWindow({
                             >
                                 <div
                                     className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-semibold ${isOwn
-                                        ? "bg-gradient-to-br from-indigo-500 to-purple-600 text-white"
+                                        ? "bg-gradient-to-br from-sky-500 to-cyan-500 text-white"
                                         : "bg-slate-700 text-slate-300"
                                         }`}
                                 >
@@ -127,7 +127,7 @@ export function ChatWindow({
                                 <div className={`max-w-[70%] ${isOwn ? "text-right" : ""}`}>
                                     <div className="flex items-center gap-2 mb-1">
                                         <span
-                                            className={`text-sm font-medium ${isOwn ? "text-indigo-400" : "text-slate-400"
+                                            className={`text-sm font-medium ${isOwn ? "text-sky-400" : "text-slate-400"
                                                 }`}
                                         >
                                             {isOwn ? "You" : message.username}
@@ -141,7 +141,7 @@ export function ChatWindow({
                                     </div>
                                     <div
                                         className={`px-4 py-2.5 rounded-2xl ${isOwn
-                                            ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-tr-sm"
+                                            ? "bg-gradient-to-r from-sky-500 to-cyan-500 text-white rounded-tr-sm"
                                             : "bg-slate-800 text-slate-100 rounded-tl-sm"
                                             }`}
                                     >

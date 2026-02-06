@@ -37,7 +37,7 @@ export function AuthForm() {
         <div className="min-h-screen flex items-center justify-center p-4">
             <div className="glass-card rounded-2xl p-8 w-full max-w-md">
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-500 mb-4">
                         <svg
                             className="w-8 h-8 text-white"
                             fill="none"
@@ -155,7 +155,7 @@ export function AuthForm() {
                                 setIsSignUp(!isSignUp);
                                 setError("");
                             }}
-                            className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+                            className="text-sky-400 hover:text-sky-300 font-medium transition-colors"
                         >
                             {isSignUp ? "Sign In" : "Sign Up"}
                         </button>
