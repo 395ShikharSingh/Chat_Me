@@ -21,7 +21,6 @@ export function ChatWindow({
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const { user } = useAuth();
 
-    // Auto-scroll to bottom on new messages
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
@@ -63,7 +62,6 @@ export function ChatWindow({
 
     return (
         <div className="flex-1 flex flex-col bg-slate-900/50">
-            {/* Room Header */}
             <div className="px-6 py-4 border-b border-slate-700/50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
@@ -94,7 +92,6 @@ export function ChatWindow({
                 </button>
             </div>
 
-            {/* Notifications */}
             {notifications.length > 0 && (
                 <div className="px-6 py-2 bg-indigo-500/10 border-b border-indigo-500/20">
                     {notifications.slice(-3).map((notification, i) => (
@@ -105,7 +102,6 @@ export function ChatWindow({
                 </div>
             )}
 
-            {/* Messages */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
                 {messages.length === 0 ? (
                     <div className="text-center py-12">
@@ -119,17 +115,15 @@ export function ChatWindow({
                                 key={message.id}
                                 className={`message-bubble flex gap-3 ${isOwn ? "flex-row-reverse" : ""}`}
                             >
-                                {/* Avatar */}
                                 <div
                                     className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-semibold ${isOwn
-                                            ? "bg-gradient-to-br from-indigo-500 to-purple-600 text-white"
-                                            : "bg-slate-700 text-slate-300"
+                                        ? "bg-gradient-to-br from-indigo-500 to-purple-600 text-white"
+                                        : "bg-slate-700 text-slate-300"
                                         }`}
                                 >
                                     {message.username.charAt(0).toUpperCase()}
                                 </div>
 
-                                {/* Message Bubble */}
                                 <div className={`max-w-[70%] ${isOwn ? "text-right" : ""}`}>
                                     <div className="flex items-center gap-2 mb-1">
                                         <span
@@ -147,8 +141,8 @@ export function ChatWindow({
                                     </div>
                                     <div
                                         className={`px-4 py-2.5 rounded-2xl ${isOwn
-                                                ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-tr-sm"
-                                                : "bg-slate-800 text-slate-100 rounded-tl-sm"
+                                            ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-tr-sm"
+                                            : "bg-slate-800 text-slate-100 rounded-tl-sm"
                                             }`}
                                     >
                                         <p className="text-sm leading-relaxed">{message.content}</p>
@@ -161,7 +155,6 @@ export function ChatWindow({
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* Message Input */}
             <div className="p-4 border-t border-slate-700/50">
                 <form onSubmit={handleSubmit} className="flex gap-3">
                     <input

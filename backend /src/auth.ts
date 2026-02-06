@@ -7,9 +7,6 @@ export interface JwtPayload {
     username: string;
 }
 
-/**
- * Hash a password using Bun's built-in password hashing
- */
 export async function hashPassword(password: string): Promise<string> {
     return await Bun.password.hash(password, {
         algorithm: "bcrypt",
@@ -17,9 +14,6 @@ export async function hashPassword(password: string): Promise<string> {
     });
 }
 
-/**
- * Verify a password against a hash
- */
 export async function verifyPassword(
     password: string,
     hash: string
@@ -27,16 +21,10 @@ export async function verifyPassword(
     return await Bun.password.verify(password, hash);
 }
 
-/**
- * Generate a JWT token for a user
- */
 export function generateToken(payload: JwtPayload): string {
     return sign(payload, JWT_SECRET, { expiresIn: "7d" });
 }
 
-/**
- * Verify and decode a JWT token
- */
 export function verifyToken(token: string): JwtPayload | null {
     try {
         return verify(token, JWT_SECRET) as JwtPayload;
@@ -45,9 +33,6 @@ export function verifyToken(token: string): JwtPayload | null {
     }
 }
 
-/**
- * Extract token from Authorization header
- */
 export function extractToken(authHeader: string | null): string | null {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return null;

@@ -53,7 +53,6 @@ export function RoomsList({ onJoinRoom, currentRoomId, isConnected }: RoomsListP
 
     return (
         <div className="w-80 glass-card h-screen flex flex-col">
-            {/* Header */}
             <div className="p-4 border-b border-slate-700/50">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
@@ -102,7 +101,6 @@ export function RoomsList({ onJoinRoom, currentRoomId, isConnected }: RoomsListP
                 </button>
             </div>
 
-            {/* Rooms List */}
             <div className="flex-1 overflow-y-auto p-3">
                 <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-2">
                     Rooms ({rooms.length})
@@ -133,15 +131,15 @@ export function RoomsList({ onJoinRoom, currentRoomId, isConnected }: RoomsListP
                                 onClick={() => onJoinRoom(room.id)}
                                 disabled={!isConnected}
                                 className={`w-full p-3 rounded-xl text-left room-card border transition-all disabled:opacity-50 disabled:cursor-not-allowed ${currentRoomId === room.id
-                                        ? "bg-indigo-500/20 border-indigo-500/50"
-                                        : "bg-transparent border-transparent hover:border-slate-700"
+                                    ? "bg-indigo-500/20 border-indigo-500/50"
+                                    : "bg-transparent border-transparent hover:border-slate-700"
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
                                     <div
                                         className={`w-10 h-10 rounded-xl flex items-center justify-center ${currentRoomId === room.id
-                                                ? "bg-indigo-500"
-                                                : "bg-slate-700"
+                                            ? "bg-indigo-500"
+                                            : "bg-slate-700"
                                             }`}
                                     >
                                         <span className="text-white font-semibold">
@@ -164,7 +162,6 @@ export function RoomsList({ onJoinRoom, currentRoomId, isConnected }: RoomsListP
                 )}
             </div>
 
-            {/* Create Room Modal */}
             {showCreateModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="glass-card rounded-2xl p-6 w-full max-w-sm">

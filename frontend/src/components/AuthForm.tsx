@@ -36,7 +36,6 @@ export function AuthForm() {
     return (
         <div className="min-h-screen flex items-center justify-center p-4">
             <div className="glass-card rounded-2xl p-8 w-full max-w-md">
-                {/* Logo / Header */}
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 mb-4">
                         <svg
@@ -63,7 +62,6 @@ export function AuthForm() {
                     </p>
                 </div>
 
-                {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-5">
                     {isSignUp && (
                         <div>
@@ -149,7 +147,6 @@ export function AuthForm() {
                     </button>
                 </form>
 
-                {/* Toggle */}
                 <div className="mt-6 text-center">
                     <p className="text-slate-400">
                         {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}

@@ -196,4 +196,4 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-Made with ❤️ by [Shikhar Singh](https://github.com/395ShikharSingh)
+

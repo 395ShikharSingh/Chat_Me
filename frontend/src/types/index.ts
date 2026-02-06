@@ -1,4 +1,3 @@
-// API types matching backend
 export interface User {
     id: string;
     username: string;
@@ -24,7 +23,6 @@ export interface AuthResponse {
     token: string;
 }
 
-// WebSocket message types
 export type ClientMessage =
     | { type: "JOIN_ROOM"; roomId: string }
     | { type: "LEAVE_ROOM" }

@@ -2,14 +2,12 @@ import type { ServerWebSocket } from "bun";
 import { db } from "./db";
 import { verifyToken, type JwtPayload } from "./auth";
 
-// WebSocket data attached to each connection
 export interface WebSocketData {
     userId: string;
     username: string;
     roomId: string | null;
 }
 
-// Message types for WebSocket communication
 type ClientMessage =
     | { type: "JOIN_ROOM"; roomId: string }
     | { type: "LEAVE_ROOM" }
@@ -30,12 +28,8 @@ interface MessageData {
     createdAt: string;
 }
 
-// Track connected users per room
 const roomConnections = new Map<string, Set<ServerWebSocket<WebSocketData>>>();
 
-/**
- * Authenticate WebSocket connection from token in query string
- */
 export function authenticateWebSocket(
     url: string
 ): { userId: string; username: string } | null {
@@ -54,16 +48,10 @@ export function authenticateWebSocket(
     return { userId: payload.userId, username: payload.username };
 }
 
-/**
- * Handle WebSocket open event
- */
 export function handleOpen(ws: ServerWebSocket<WebSocketData>) {
     console.log(`User ${ws.data.username} connected`);
 }
 
-/**
- * Handle WebSocket close event
- */
 export function handleClose(ws: ServerWebSocket<WebSocketData>) {
     console.log(`User ${ws.data.username} disconnected`);
 
@@ -72,9 +60,6 @@ export function handleClose(ws: ServerWebSocket<WebSocketData>) {
     }
 }
 
-/**
- * Handle incoming WebSocket messages
- */
 export async function handleMessage(
     ws: ServerWebSocket<WebSocketData>,
     message: string | Buffer
@@ -104,16 +89,11 @@ export async function handleMessage(
     }
 }
 
-/**
- * Join a room and receive message history
- */
 async function joinRoom(ws: ServerWebSocket<WebSocketData>, roomId: string) {
-    // Leave current room if in one
     if (ws.data.roomId) {
         leaveRoom(ws);
     }
 
-    // Verify room exists
     const room = await db.room.findUnique({
         where: { id: roomId },
     });
@@ -123,7 +103,6 @@ async function joinRoom(ws: ServerWebSocket<WebSocketData>, roomId: string) {
         return;
     }
 
-    // Get last 50 messages
     const messages = await db.message.findMany({
         where: { roomId },
         orderBy: { createdAt: "desc" },
@@ -131,7 +110,6 @@ async function joinRoom(ws: ServerWebSocket<WebSocketData>, roomId: string) {
         include: { user: { select: { username: true } } },
     });
 
-    // Reverse to get chronological order
     const messageData: MessageData[] = messages.reverse().map((m: { id: string; content: string; user: { username: string }; createdAt: Date }) => ({
         id: m.id,
         content: m.content,
@@ -139,38 +117,27 @@ async function joinRoom(ws: ServerWebSocket<WebSocketData>, roomId: string) {
         createdAt: m.createdAt.toISOString(),
     }));
 
-    // Subscribe to room
     ws.subscribe(roomId);
     ws.data.roomId = roomId;
 
-    // Track connection
     if (!roomConnections.has(roomId)) {
         roomConnections.set(roomId, new Set());
     }
     roomConnections.get(roomId)!.add(ws);
 
-    // Send room joined with history
     send(ws, { type: "ROOM_JOINED", roomId, messages: messageData });
-
-    // Notify others
     broadcast(ws, roomId, { type: "USER_JOINED", username: ws.data.username });
 }
 
-/**
- * Leave current room
- */
 function leaveRoom(ws: ServerWebSocket<WebSocketData>) {
     const roomId = ws.data.roomId;
     if (!roomId) return;
 
-    // Notify others
     broadcast(ws, roomId, { type: "USER_LEFT", username: ws.data.username });
 
-    // Unsubscribe
     ws.unsubscribe(roomId);
     ws.data.roomId = null;
 
-    // Remove from tracking
     roomConnections.get(roomId)?.delete(ws);
     if (roomConnections.get(roomId)?.size === 0) {
         roomConnections.delete(roomId);
@@ -179,9 +146,6 @@ function leaveRoom(ws: ServerWebSocket<WebSocketData>) {
     send(ws, { type: "ROOM_LEFT" });
 }
 
-/**
- * Send a message to the current room
- */
 async function sendMessage(
     ws: ServerWebSocket<WebSocketData>,
     content: string
@@ -197,7 +161,6 @@ async function sendMessage(
         return;
     }
 
-    // Save to database
     const message = await db.message.create({
         data: {
             content: content.trim(),
@@ -214,16 +177,10 @@ async function sendMessage(
         createdAt: message.createdAt.toISOString(),
     };
 
-    // Broadcast to all in room (including sender)
     broadcastToRoom(roomId, { type: "NEW_MESSAGE", message: messageData });
-
-    // Cleanup old messages (keep only 50 per room)
     await cleanupOldMessages(roomId);
 }
 
-/**
- * Keep only the last 50 messages per room
- */
 async function cleanupOldMessages(roomId: string) {
     const messages = await db.message.findMany({
         where: { roomId },
@@ -239,23 +196,14 @@ async function cleanupOldMessages(roomId: string) {
     }
 }
 
-/**
- * Send message to a single client
- */
 function send(ws: ServerWebSocket<WebSocketData>, data: ServerMessage) {
     ws.send(JSON.stringify(data));
 }
 
-/**
- * Send error to client
- */
 function sendError(ws: ServerWebSocket<WebSocketData>, message: string) {
     send(ws, { type: "ERROR", message });
 }
 
-/**
- * Broadcast to all in room except sender
- */
 function broadcast(
     ws: ServerWebSocket<WebSocketData>,
     roomId: string,
@@ -272,9 +220,6 @@ function broadcast(
     }
 }
 
-/**
- * Broadcast to all in room including sender
- */
 function broadcastToRoom(roomId: string, data: ServerMessage) {
     const connections = roomConnections.get(roomId);
     if (!connections) return;
