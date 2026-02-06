@@ -1,0 +1,65 @@
+# ===================
+# Root-level .gitignore
+# ===================
+
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Docker
+*.pid
+*.seed
+
+# Misc
+*.bak
+*.tmp
+*.temp
+
+# ===================
+# Backend specific
+# ===================
+backend /node_modules/
+backend /generated/
+backend /dist/
+backend /out/
+backend /.env
+backend /coverage/
+backend /*.tsbuildinfo
+backend /bun.lockb
+
+# ===================
+# Frontend specific  
+# ===================
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/build/
+frontend/.env
+frontend/coverage/
+frontend/*.tsbuildinfo
