@@ -22,10 +22,17 @@ export function useWebSocket(token: string | null): UseWebSocketReturn {
     const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
     const [roomDeleted, setRoomDeleted] = useState<string | null>(null);
     const wsRef = useRef<WebSocket | null>(null);
+    const currentRoomIdRef = useRef<string | null>(null);
+
+    // Keep ref in sync with state
+    useEffect(() => {
+        currentRoomIdRef.current = currentRoomId;
+    }, [currentRoomId]);
 
     useEffect(() => {
         if (!token) return;
 
+        console.log("Connecting WebSocket...");
         const ws = createWebSocket(token);
         wsRef.current = ws;
 
@@ -37,6 +44,11 @@ export function useWebSocket(token: string | null): UseWebSocketReturn {
         ws.onclose = () => {
             console.log("WebSocket disconnected");
             setIsConnected(false);
+            // Don't reset currentRoomId here to prevent UI flicker on brief reconnects,
+            // or do reset if that's desired behavior. 
+            // For now, let's keep it null if we want to force rejoin, 
+            // but persistent state is better if we auto-reconnect.
+            // Matching original logic:
             setCurrentRoomId(null);
         };
 
@@ -69,7 +81,8 @@ export function useWebSocket(token: string | null): UseWebSocketReturn {
 
                 case "ROOM_DELETED":
                     setRoomDeleted(data.roomId);
-                    if (data.roomId === currentRoomId) {
+                    // Use ref to check against current room without triggering effect re-run
+                    if (data.roomId === currentRoomIdRef.current) {
                         setCurrentRoomId(null);
                         setMessages([]);
                         setNotifications((prev) => [...prev, "This room has been deleted"]);
@@ -90,11 +103,14 @@ export function useWebSocket(token: string | null): UseWebSocketReturn {
         return () => {
             ws.close();
         };
-    }, [token, currentRoomId]);
+    }, [token]); // Removed currentRoomId from dependency array
 
     const send = useCallback((message: ClientMessage) => {
+        console.log("Sending WebSocket message:", message);
         if (wsRef.current?.readyState === WebSocket.OPEN) {
             wsRef.current.send(JSON.stringify(message));
+        } else {
+            console.error("WebSocket is not open. State:", wsRef.current?.readyState);
         }
     }, []);
 
