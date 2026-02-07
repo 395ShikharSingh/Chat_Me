@@ -85,7 +85,7 @@ export async function handleMessage(
                 sendError(ws, "Unknown message type");
         }
     } catch (error) {
-        console.error("Error handling message:", error);
+        // console.error("Error handling message:", error);
         sendError(ws, "Invalid message format");
     }
 }

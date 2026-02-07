@@ -32,23 +32,15 @@ export function useWebSocket(token: string | null): UseWebSocketReturn {
     useEffect(() => {
         if (!token) return;
 
-        console.log("Connecting WebSocket...");
         const ws = createWebSocket(token);
         wsRef.current = ws;
 
         ws.onopen = () => {
-            console.log("WebSocket connected");
             setIsConnected(true);
         };
 
         ws.onclose = () => {
-            console.log("WebSocket disconnected");
             setIsConnected(false);
-            // Don't reset currentRoomId here to prevent UI flicker on brief reconnects,
-            // or do reset if that's desired behavior. 
-            // For now, let's keep it null if we want to force rejoin, 
-            // but persistent state is better if we auto-reconnect.
-            // Matching original logic:
             setCurrentRoomId(null);
         };
 
@@ -103,14 +95,11 @@ export function useWebSocket(token: string | null): UseWebSocketReturn {
         return () => {
             ws.close();
         };
-    }, [token]); // Removed currentRoomId from dependency array
+    }, [token]);
 
     const send = useCallback((message: ClientMessage) => {
-        console.log("Sending WebSocket message:", message);
         if (wsRef.current?.readyState === WebSocket.OPEN) {
             wsRef.current.send(JSON.stringify(message));
-        } else {
-            console.error("WebSocket is not open. State:", wsRef.current?.readyState);
         }
     }, []);
 
