@@ -54,6 +54,10 @@ body {
   animation: slideIn 0.3s ease-out;
 }
 
+.message-bubble-received {
+  animation: puzzleConnect 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -63,6 +67,57 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes puzzleConnect {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-15deg) translateX(-30px);
+    filter: blur(4px);
+  }
+
+  30% {
+    opacity: 0.7;
+    transform: scale(0.8) rotate(5deg) translateX(-10px);
+    filter: blur(1px);
+  }
+
+  50% {
+    transform: scale(1.1) rotate(-2deg) translateX(5px);
+    filter: blur(0);
+  }
+
+  70% {
+    transform: scale(0.95) rotate(1deg);
+  }
+
+  85% {
+    transform: scale(1.02) rotate(-0.5deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0) translateX(0);
+    filter: blur(0);
+  }
+}
+
+.puzzle-glow {
+  animation: glowPulse 0.8s ease-out;
+}
+
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.6);
+  }
+
+  50% {
+    box-shadow: 0 0 20px 10px rgba(14, 165, 233, 0.3);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0);
   }
 }
 
@@ -122,4 +177,13 @@ body {
   50% {
     opacity: 0.5;
   }
+}
+
+.delete-btn {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.room-card:hover .delete-btn {
+  opacity: 1;
 }

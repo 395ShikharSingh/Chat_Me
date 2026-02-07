@@ -11,6 +11,7 @@ import {
     handleOpen,
     handleClose,
     handleMessage,
+    broadcastToRoom,
     type WebSocketData,
 } from "./src/websocket";
 
@@ -18,7 +19,7 @@ const PORT = process.env.PORT || 3000;
 
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
@@ -46,6 +47,11 @@ async function handleRequest(req: Request): Promise<Response> {
 
         if (path === "/rooms" && method === "POST") {
             return await handleCreateRoom(req);
+        }
+
+        const roomDeleteMatch = path.match(/^\/rooms\/([^/]+)$/);
+        if (roomDeleteMatch && roomDeleteMatch[1] && method === "DELETE") {
+            return await handleDeleteRoom(req, roomDeleteMatch[1]);
         }
 
         const roomMessagesMatch = path.match(/^\/rooms\/([^/]+)\/messages$/);
@@ -133,6 +139,7 @@ async function handleGetRooms(): Promise<Response> {
         select: {
             id: true,
             name: true,
+            creatorId: true,
             createdAt: true,
             _count: { select: { messages: true } },
         },
@@ -143,7 +150,8 @@ async function handleGetRooms(): Promise<Response> {
 
 async function handleCreateRoom(req: Request): Promise<Response> {
     const token = extractToken(req.headers.get("Authorization"));
-    if (!token || !verifyToken(token)) {
+    const payload = token ? verifyToken(token) : null;
+    if (!payload) {
         return json({ error: "Unauthorized" }, 401);
     }
 
@@ -160,10 +168,39 @@ async function handleCreateRoom(req: Request): Promise<Response> {
     }
 
     const room = await db.room.create({
-        data: { name: name.trim() },
+        data: {
+            name: name.trim(),
+            creatorId: payload.userId,
+        },
     });
 
     return json({ room });
+}
+
+async function handleDeleteRoom(req: Request, roomId: string): Promise<Response> {
+    const token = extractToken(req.headers.get("Authorization"));
+    const payload = token ? verifyToken(token) : null;
+    if (!payload) {
+        return json({ error: "Unauthorized" }, 401);
+    }
+
+    const room = await db.room.findUnique({ where: { id: roomId } });
+    if (!room) {
+        return json({ error: "Room not found" }, 404);
+    }
+
+    if (room.creatorId !== payload.userId) {
+        return json({ error: "Only the room creator can delete this room" }, 403);
+    }
+
+    broadcastToRoom(roomId, {
+        type: "ROOM_DELETED",
+        roomId,
+    });
+
+    await db.room.delete({ where: { id: roomId } });
+
+    return json({ success: true });
 }
 
 async function handleGetRoomMessages(roomId: string): Promise<Response> {

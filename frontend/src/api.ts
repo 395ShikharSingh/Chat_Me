@@ -36,6 +36,16 @@ export async function createRoom(name: string, token: string) {
     return res.json();
 }
 
+export async function deleteRoom(roomId: string, token: string) {
+    const res = await fetch(`${API_URL}/rooms/${roomId}`, {
+        method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return res.json();
+}
+
 export async function getRoomMessages(roomId: string) {
     const res = await fetch(`${API_URL}/rooms/${roomId}/messages`);
     return res.json();

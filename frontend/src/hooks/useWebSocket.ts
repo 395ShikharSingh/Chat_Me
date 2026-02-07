@@ -7,10 +7,12 @@ interface UseWebSocketReturn {
     notifications: string[];
     isConnected: boolean;
     currentRoomId: string | null;
+    roomDeleted: string | null;
     joinRoom: (roomId: string) => void;
     leaveRoom: () => void;
     sendMessage: (content: string) => void;
     clearNotifications: () => void;
+    clearRoomDeleted: () => void;
 }
 
 export function useWebSocket(token: string | null): UseWebSocketReturn {
@@ -18,6 +20,7 @@ export function useWebSocket(token: string | null): UseWebSocketReturn {
     const [notifications, setNotifications] = useState<string[]>([]);
     const [isConnected, setIsConnected] = useState(false);
     const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
+    const [roomDeleted, setRoomDeleted] = useState<string | null>(null);
     const wsRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
@@ -53,7 +56,7 @@ export function useWebSocket(token: string | null): UseWebSocketReturn {
                     break;
 
                 case "NEW_MESSAGE":
-                    setMessages((prev) => [...prev, data.message]);
+                    setMessages((prev) => [...prev, { ...data.message, isOwn: false }]);
                     break;
 
                 case "USER_JOINED":
@@ -62,6 +65,15 @@ export function useWebSocket(token: string | null): UseWebSocketReturn {
 
                 case "USER_LEFT":
                     setNotifications((prev) => [...prev, `${data.username} left the room`]);
+                    break;
+
+                case "ROOM_DELETED":
+                    setRoomDeleted(data.roomId);
+                    if (data.roomId === currentRoomId) {
+                        setCurrentRoomId(null);
+                        setMessages([]);
+                        setNotifications((prev) => [...prev, "This room has been deleted"]);
+                    }
                     break;
 
                 case "ERROR":
@@ -78,7 +90,7 @@ export function useWebSocket(token: string | null): UseWebSocketReturn {
         return () => {
             ws.close();
         };
-    }, [token]);
+    }, [token, currentRoomId]);
 
     const send = useCallback((message: ClientMessage) => {
         if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -108,14 +120,20 @@ export function useWebSocket(token: string | null): UseWebSocketReturn {
         setNotifications([]);
     }, []);
 
+    const clearRoomDeleted = useCallback(() => {
+        setRoomDeleted(null);
+    }, []);
+
     return {
         messages,
         notifications,
         isConnected,
         currentRoomId,
+        roomDeleted,
         joinRoom,
         leaveRoom,
         sendMessage,
         clearNotifications,
+        clearRoomDeleted,
     };
 }

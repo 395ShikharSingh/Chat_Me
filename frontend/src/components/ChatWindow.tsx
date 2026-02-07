@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
 import type { Message } from "../types";
 
 interface ChatWindowProps {
@@ -8,6 +7,7 @@ interface ChatWindowProps {
     currentRoomId: string | null;
     onSendMessage: (content: string) => void;
     onLeaveRoom: () => void;
+    currentUsername: string;
 }
 
 export function ChatWindow({
@@ -16,14 +16,24 @@ export function ChatWindow({
     currentRoomId,
     onSendMessage,
     onLeaveRoom,
+    currentUsername,
 }: ChatWindowProps) {
     const [newMessage, setNewMessage] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const { user } = useAuth();
+    const [animatedIds, setAnimatedIds] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
+
+    useEffect(() => {
+        if (messages.length > 0) {
+            const lastMessage = messages[messages.length - 1];
+            if (lastMessage.username !== currentUsername && !animatedIds.has(lastMessage.id)) {
+                setAnimatedIds((prev) => new Set([...prev, lastMessage.id]));
+            }
+        }
+    }, [messages, currentUsername, animatedIds]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -110,11 +120,12 @@ export function ChatWindow({
                     </div>
                 ) : (
                     messages.map((message) => {
-                        const isOwn = message.username === user?.username;
+                        const isOwn = message.username === currentUsername;
+                        const shouldAnimate = animatedIds.has(message.id) && !isOwn;
                         return (
                             <div
                                 key={message.id}
-                                className={`message-bubble flex gap-2 md:gap-3 ${isOwn ? "flex-row-reverse" : ""}`}
+                                className={`flex gap-2 md:gap-3 ${isOwn ? "flex-row-reverse" : ""} ${isOwn ? "message-bubble" : shouldAnimate ? "message-bubble-received puzzle-glow" : ""}`}
                             >
                                 <div
                                     className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs md:text-sm font-semibold ${isOwn

@@ -6,16 +6,18 @@ import { RoomsList } from "./components/RoomsList";
 import { ChatWindow } from "./components/ChatWindow";
 
 function ChatApp() {
-  const { isAuthenticated, token } = useAuth();
+  const { isAuthenticated, token, user } = useAuth();
   const [showSidebar, setShowSidebar] = useState(false);
   const {
     messages,
     notifications,
     isConnected,
     currentRoomId,
+    roomDeleted,
     joinRoom,
     leaveRoom,
     sendMessage,
+    clearRoomDeleted,
   } = useWebSocket(token);
 
   if (!isAuthenticated) {
@@ -53,6 +55,8 @@ function ChatApp() {
           onJoinRoom={handleJoinRoom}
           currentRoomId={currentRoomId}
           isConnected={isConnected}
+          roomDeleted={roomDeleted}
+          onRoomDeleted={clearRoomDeleted}
         />
       </div>
 
@@ -62,6 +66,7 @@ function ChatApp() {
         currentRoomId={currentRoomId}
         onSendMessage={sendMessage}
         onLeaveRoom={leaveRoom}
+        currentUsername={user?.username || ""}
       />
     </div>
   );

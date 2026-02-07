@@ -7,6 +7,7 @@ export interface User {
 export interface Room {
     id: string;
     name: string;
+    creatorId?: string;
     createdAt: string;
     _count?: { messages: number };
 }
@@ -16,6 +17,7 @@ export interface Message {
     content: string;
     username: string;
     createdAt: string;
+    isOwn?: boolean;
 }
 
 export interface AuthResponse {
@@ -34,4 +36,5 @@ export type ServerMessage =
     | { type: "NEW_MESSAGE"; message: Message }
     | { type: "USER_JOINED"; username: string }
     | { type: "USER_LEFT"; username: string }
+    | { type: "ROOM_DELETED"; roomId: string }
     | { type: "ERROR"; message: string };

@@ -19,6 +19,7 @@ type ServerMessage =
     | { type: "NEW_MESSAGE"; message: MessageData }
     | { type: "USER_JOINED"; username: string }
     | { type: "USER_LEFT"; username: string }
+    | { type: "ROOM_DELETED"; roomId: string }
     | { type: "ERROR"; message: string };
 
 interface MessageData {
@@ -220,7 +221,7 @@ function broadcast(
     }
 }
 
-function broadcastToRoom(roomId: string, data: ServerMessage) {
+export function broadcastToRoom(roomId: string, data: ServerMessage | { type: "ROOM_DELETED"; roomId: string }) {
     const connections = roomConnections.get(roomId);
     if (!connections) return;
 

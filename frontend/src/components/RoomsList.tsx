@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getRooms, createRoom } from "../api";
+import { getRooms, createRoom, deleteRoom } from "../api";
 import { useAuth } from "../context/AuthContext";
 import type { Room } from "../types";
 
@@ -7,19 +7,29 @@ interface RoomsListProps {
     onJoinRoom: (roomId: string) => void;
     currentRoomId: string | null;
     isConnected: boolean;
+    roomDeleted: string | null;
+    onRoomDeleted: () => void;
 }
 
-export function RoomsList({ onJoinRoom, currentRoomId, isConnected }: RoomsListProps) {
+export function RoomsList({ onJoinRoom, currentRoomId, isConnected, roomDeleted, onRoomDeleted }: RoomsListProps) {
     const [rooms, setRooms] = useState<Room[]>([]);
     const [newRoomName, setNewRoomName] = useState("");
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [creating, setCreating] = useState(false);
+    const [deleting, setDeleting] = useState<string | null>(null);
     const { token, user, logout } = useAuth();
 
     useEffect(() => {
         loadRooms();
     }, []);
+
+    useEffect(() => {
+        if (roomDeleted) {
+            setRooms((prev) => prev.filter((r) => r.id !== roomDeleted));
+            onRoomDeleted();
+        }
+    }, [roomDeleted, onRoomDeleted]);
 
     const loadRooms = async () => {
         try {
@@ -48,6 +58,25 @@ export function RoomsList({ onJoinRoom, currentRoomId, isConnected }: RoomsListP
             console.error("Failed to create room:", error);
         } finally {
             setCreating(false);
+        }
+    };
+
+    const handleDeleteRoom = async (e: React.MouseEvent, roomId: string) => {
+        e.stopPropagation();
+        if (!token) return;
+
+        setDeleting(roomId);
+        try {
+            const result = await deleteRoom(roomId, token);
+            if (result.success) {
+                setRooms((prev) => prev.filter((r) => r.id !== roomId));
+            } else if (result.error) {
+                alert(result.error);
+            }
+        } catch (error) {
+            console.error("Failed to delete room:", error);
+        } finally {
+            setDeleting(null);
         }
     };
 
@@ -127,11 +156,10 @@ export function RoomsList({ onJoinRoom, currentRoomId, isConnected }: RoomsListP
                     ) : (
                         <div className="space-y-1">
                             {rooms.map((room) => (
-                                <button
+                                <div
                                     key={room.id}
-                                    onClick={() => onJoinRoom(room.id)}
-                                    disabled={!isConnected}
-                                    className={`w-full p-3 rounded-xl text-left room-card border transition-all disabled:opacity-50 disabled:cursor-not-allowed ${currentRoomId === room.id
+                                    onClick={() => isConnected && onJoinRoom(room.id)}
+                                    className={`w-full p-3 rounded-xl text-left room-card border transition-all cursor-pointer ${!isConnected ? "opacity-50 cursor-not-allowed" : ""} ${currentRoomId === room.id
                                         ? "bg-sky-500/20 border-sky-500/50"
                                         : "bg-transparent border-transparent hover:border-slate-700"
                                         }`}
@@ -153,11 +181,30 @@ export function RoomsList({ onJoinRoom, currentRoomId, isConnected }: RoomsListP
                                                 {room._count?.messages || 0} messages
                                             </p>
                                         </div>
+                                        {room.creatorId === user?.id && (
+                                            <button
+                                                onClick={(e) => handleDeleteRoom(e, room.id)}
+                                                disabled={deleting === room.id}
+                                                className="delete-btn p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-lg transition-all"
+                                                title="Delete room"
+                                            >
+                                                {deleting === room.id ? (
+                                                    <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                                    </svg>
+                                                ) : (
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                )}
+                                            </button>
+                                        )}
                                         {currentRoomId === room.id && (
                                             <span className="w-2 h-2 rounded-full bg-green-400" />
                                         )}
                                     </div>
-                                </button>
+                                </div>
                             ))}
                         </div>
                     )}
